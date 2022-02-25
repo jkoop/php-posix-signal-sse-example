@@ -18,10 +18,11 @@ $redis->connect(
     $_ENV['REDIS_HOST'],
     $_ENV['REDIS_PORT'],
 );
+$redis->setOption(Redis::OPT_PREFIX, $_ENV['REDIS_PREFIX'] . ':');
 $redis->config('SET', 'notify-keyspace-events', 'KEA');
 
-// echo existing messages
-$messageKeys = $redis->keys($_ENV['REDIS_PREFIX'] . '-message-*');
+// send existing messages
+$messageKeys = $redis->keys('message-*');
 $messages = $redis->mGet($messageKeys);
 foreach ($messages as $message) {
     echo 'message => ' . $message . PHP_EOL;
@@ -30,14 +31,14 @@ unset($messages, $messageKeys);
 ob_flush();
 flush();
 
-// echo messages as they come in
+// send messages as they come in
 $redis->setOption(Redis::OPT_READ_TIMEOUT, 10); // so we can send a heartbeat
 while (!connection_aborted()) { // while the connection is open
     try { // psubscribe() will normally throw an exception when the connection times out
-        $redis->psubscribe(['__key*__:' . $_ENV['REDIS_PREFIX'] . '-message-*'], function ($redis, $pattern, $channel, $eventType) {
+        $redis->psubscribe(['__key*__:' . $_ENV['REDIS_PREFIX'] . ':message-*'], function ($redis, $pattern, $channel, $eventType) {
             if ($eventType == 'set') {
                 // $messageKey = substr($channel, strlen('__keyspace@0__:'));
-                echo 'message => ' . $redis->get($_ENV['REDIS_PREFIX'] . '-last-id') . PHP_EOL;
+                echo 'message => ' . $redis->get('last-id') . PHP_EOL;
                 ob_flush();
                 flush();
             }

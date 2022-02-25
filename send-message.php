@@ -17,26 +17,14 @@ $redis = new Redis; // this requires php-redis (https://github.com/phpredis/phpr
 $redis->connect(
     $_ENV['REDIS_HOST'],
     $_ENV['REDIS_PORT'],
-    $_ENV['REDIS_PASSWORD'] ?? null,
 );
-
-// lock `REDIS_PREFIX-queue-end` for 10 seconds to prevent a possible race condition
-// while the lock is set, if its value is in the past, delete it, else wait 10ms, loop
-while (!$redis->setnx($_ENV['REDIS_PREFIX'] . '-lock', time() + 10)) {
-    if ($redis->get($_ENV['REDIS_PREFIX'] . '-lock') < time()) {
-        $redis->del($_ENV['REDIS_PREFIX'] . '-lock');
-    } else {
-        // sleep for 10ms and try again
-        usleep(10000);
-    }
-}
+$redis->setOption(Redis::OPT_PREFIX, $_ENV['REDIS_PREFIX'] . ':');
 
 // `REDIS_PREFIX-queue-end` is the ID of the last message in the queue
-$redis->incr($_ENV['REDIS_PREFIX'] . '-last-id'); // increment the ID by one or create the key and set to 1
-$number = $redis->get($_ENV['REDIS_PREFIX'] . '-last-id'); // get the new ID
+// increment the ID by one or create the key and set to 1; returns the new value; probably thread-safe
+$newMessageId = $redis->incr('last-id');
 
-// release the lock
-$redis->del($_ENV['REDIS_PREFIX'] . '-lock');
+$messageText = $_SERVER['REMOTE_ADDR'] . ': ' . $_POST['message'];
 
 // set the message in the queue
 // expires in 60 seconds (personal preference for this project)
