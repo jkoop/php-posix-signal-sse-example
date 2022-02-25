@@ -1,6 +1,6 @@
 # PHP Redis SSE Example
 
-This is a simple example of an SSE subscription endpoint using PHP and Redis. The example scenario is a *very* simple chat client.
+This is a simple example of an [SSE](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) subscription endpoint using PHP and Redis. The example scenario is a *very* simple chat client.
 
 Notable features include:
 + The PHP script doesn't "spin" and instead uses Redis to listen for new messages.
