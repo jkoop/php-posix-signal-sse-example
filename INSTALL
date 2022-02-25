@@ -1,5 +1,0 @@
-INSTALL
-
-  DEPENDENCIES
-composer install
-sudo apt install php-redis
