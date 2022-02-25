@@ -11,7 +11,7 @@ require 'vendor/autoload.php';
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
-$dotenv->required(['REDIS_HOST', 'REDIS_PORT', 'REDIS_PREFIX']);
+$dotenv->required(['REDIS_HOST', 'REDIS_PORT', 'REDIS_PREFIX', 'MESSAGE_TTL']);
 
 $redis = new Redis; // this requires php-redis (https://github.com/phpredis/phpredis)
 $redis->connect(
@@ -40,6 +40,6 @@ $redis->del($_ENV['REDIS_PREFIX'] . '-lock');
 
 // set the message in the queue
 // expires in 60 seconds (personal preference for this project)
-$redis->set($_ENV['REDIS_PREFIX'] . '-message-' . $number, $_POST['message'], 60);
+$redis->set('message-' . $newMessageId, $messageText, $_ENV['MESSAGE_TTL']);
 
 echo 'Success';

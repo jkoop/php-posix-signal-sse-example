@@ -17,7 +17,6 @@ $redis = new Redis; // this requires php-redis (https://github.com/phpredis/phpr
 $redis->connect(
     $_ENV['REDIS_HOST'],
     $_ENV['REDIS_PORT'],
-    $_ENV['REDIS_PASSWORD'] ?? null,
 );
 $redis->config('SET', 'notify-keyspace-events', 'KEA');
 
