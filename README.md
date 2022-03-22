@@ -1,13 +1,10 @@
-# PHP Redis SSE Example
+# PHP POSIX Signal SSE Example
 
-This is a simple example of an [SSE](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) subscription endpoint using PHP and Redis. The example scenario is a *very* simple chat client.
+This is a simple example of an [SSE](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events) subscription endpoint using PHP and POSIX signals. The example scenario is a *very* simple chat client.
 
 Notable features include:
-+ The PHP script doesn't "spin" and instead uses Redis to listen for new messages.
++ The PHP script uses POSIX signals to trigger the transmission of new messages.
+    + This is a type of non-busy waiting, which is good for performance.
 
-## Installation
-
-1. clone this repo
-2. `composer install`
-3. `sudo apt install php-redis` or [build from source](https://github.com/phpredis/phpredis/blob/develop/INSTALL.markdown)
-4. restart apache or php-fpm or whatever you use
+## Requirements
++ POSIX-compliant operating system (Linux, macOS, etc.)
